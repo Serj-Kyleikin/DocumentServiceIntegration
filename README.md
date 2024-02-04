@@ -1,1 +1,1 @@
-Выполнить sudo ./start.sh
+sudo ./start.sh
