@@ -13,9 +13,6 @@ cd ..
 sudo cp -rpt laravel project/.
 
 docker-compose up -d --build
-docker exec -it app bash
-composer update
-&& php artisan migrate
-&& php artisan --seed
+docker exec -it app bash -c "composer update && php artisan migrate --seed"
 
 echo "Done! Good luck.."
