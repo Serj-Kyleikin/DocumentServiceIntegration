@@ -1,37 +1,38 @@
-version: "3"
+version: "3.5"
 services:
     nginx:
         image: nginx:latest
+        container_name: nginx
+        restart: unless-stopped
+        ports:
+            - 8876:80
         volumes:
             - './laravel:/var/www/laravel'
             - './_docker/nginx/conf.d:/etc/nginx/conf.d'
-        ports:
-            - 8876:80
+    db:
+        image: mysql:8
+        container_name: db
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: work
         depends_on:
-            - application
-        container_name: nginx
+            - nginx
+        restart: always
+        ports:
+            - 8101:3306
+        volumes:
+            - './mysql_db:/var/lib/mysql'
+        command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    adminer:
+        image: adminer
+        ports:
+            - 8080:8080
     application:
+        container_name: app
+        depends_on:
+            - db
         build:
             context: .
             dockerfile: _docker/app/Dockerfile
         volumes:
             - './laravel:/var/www/laravel'
-        depends_on:
-            - db
-        container_name: app
-    db:
-        image: mysql:8
-        restart: always
-        volumes:
-            - './mysql_db:/var/lib/mysql'
-        environment:
-            MYSQL_ROOT_PASSWORD: root
-            MYSQL_DATABASE: work
-        ports:
-            - 8101:3306
-        command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
-        container_name: db
-    adminer:
-        image: adminer
-        ports:
-            - 8080:8080
